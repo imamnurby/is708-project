@@ -63,12 +63,17 @@ def resolve_pointing_direction(scene_image):
     #         points.append(None)
     # cv2.imwrite("test.jpg",frameCopy)
 
+    '''
+    TODO: You should implement code to get proper value of gradient and intercept 
+    to replace assignments of mock values below.
+    '''
+    
     img = np.copy(scene_image)
 
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img_hsv = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HSV)
 
-    # extract hand countour by picking the largest countour area
+    # extract hand by extracting the hand countrour (picking the largest countour area)
     upper = np.array([0, 0.35*255, 0])
     bottom = np.array([15, 0.75*255, 255])
     mask = cv2.inRange(img_hsv, upper, bottom)
@@ -90,7 +95,7 @@ def resolve_pointing_direction(scene_image):
     # identify fingertip
     extTop = tuple(max_cnt[max_cnt[:, :, 1].argmin()][0])
     cv2.circle(img, extTop, 3, (255, 0, 0), -1, lineType=cv2.FILLED) 
-    cv2.putText(img, "top", extTop, cv2.FONT_HERSHEY_SIMPLEX, .8, (0, 0, 255), 2, lineType=cv2.LINE_AA)
+    cv2.putText(img, "fingertip", extTop, cv2.FONT_HERSHEY_SIMPLEX, .8, (0, 0, 255), 2, lineType=cv2.LINE_AA)
 
     # draw line between centroid and fingertip
     cv2.line(img, extTop, (cX, cY), 1, 3)
@@ -99,13 +104,8 @@ def resolve_pointing_direction(scene_image):
     # plt.imshow(img)
     # plt.show()
     cv2.imwrite("test.jpg",img)
-
-
-    '''
-    TODO: You should implement code to get proper value of gradient and intercept 
-    to replace assignments of mock values below.
-    '''
     
+    # calculate gradient and slope
     x2, y2 = extTop
     x1, y1 = (cX, cY)
     gradient=(y2-y1)/(x2-x1)
