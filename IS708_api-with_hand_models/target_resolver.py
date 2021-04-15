@@ -36,7 +36,7 @@ def resolve_target(scene_image, detected_objects, pointing_direction, command_te
 
     
     # extract object from command text
-    if command_text != None
+    if command_text != None:
         doc = nlp(command_text)
         obj_l = []
         obj_l = [token.text for token in doc if token.dep_ == "dobj"]
