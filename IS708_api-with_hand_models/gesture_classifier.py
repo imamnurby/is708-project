@@ -37,7 +37,14 @@ def predict(raw_segment_dataframe):
     features = scaler.transform(features)
 
     # predict gesture
-    gesture = classifier.predict(features)
+    classifier_output = classifier.predict(features)
+
+    if classifier_output == 0:
+        gesture = "Null"
+    elif classifier_output == 1:
+        gesture = "Nodding"
+    elif classifier_output == 2:
+        gesture = "Shaking"
 
     return gesture
 
