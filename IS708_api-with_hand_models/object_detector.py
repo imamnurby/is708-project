@@ -23,6 +23,9 @@ def detect_objects(scene_image):
     frameCopy = draw_bbox(frameCopy, bbox, label, conf)
     cv2.imwrite("result_object_detector.jpg",frameCopy)
 
+    if len(detected_objects) == 0:
+        detected_objects = None
+        
     return detected_objects
 
 if __name__ == '__main__':

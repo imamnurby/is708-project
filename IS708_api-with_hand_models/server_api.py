@@ -28,13 +28,14 @@ def detect_target():
         else:
             scene_image_file = request.files['scene_image_file']
             # Save for debugging
-            scene_image_file.save('./temp_image.txt')
-    
+            scene_image_file.save('./result_undecoded.txt')
+            
     
     command_text = request.form['command_text']
+    print(f"Image saved. command_text = {command_text}")
     
     # decode scene_image
-    with open('temp_image.txt') as f:
+    with open('result_undecoded.txt') as f:
         lines = f.readlines()
 
     base64str = ""
@@ -42,13 +43,12 @@ def detect_target():
         base64str = base64str + element
     
     imgdata = base64.b64decode(base64str)
-    filename = 'temp_image.jpeg'  # I assume you have a way of picking unique filenames
+    filename = 'result_original_file.jpg'  # I assume you have a way of picking unique filenames
     with open(filename, 'wb') as f:
         f.write(imgdata)
 
-    scene_image = cv2.imread('./temp_image.jpeg')
-    print(f"Image saved. command_text = {command_text}")
-        
+    scene_image = cv2.imread('./result_original_file.jpg')
+    
     detected_objects = object_detector.detect_objects(scene_image)
     print(detected_objects)
     if detected_objects is None:
