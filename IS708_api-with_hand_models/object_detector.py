@@ -16,7 +16,7 @@ def detect_objects(scene_image):
     (obj_name, [bbox_coordinate]). E.g. ('chair',[0,0,100,100])
     """
     frameCopy = np.copy(scene_image)
-    bbox, label, conf = cv.detect_common_objects(scene_image)
+    bbox, label, conf = cv.detect_common_objects(frameCopy)
     detected_objects = list(zip(label, bbox))
     detected_objects = [x for x in detected_objects if x[0]!="person"]
     
