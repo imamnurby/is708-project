@@ -7,26 +7,26 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.StringRequestListener;
-
 import java.io.File;
+
 
 public class CommModule {
     private final static String SERVER_IP = "http://192.168.2.45:5000";
 
-    public static void callTargetDetectionApi(String command, MainActivity sourceActivity){
-        String targetFileFullPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/temp_image.jpeg";
+    public static void callTargetDetectionApi(String command, MainActivity sourceActivity) {
+        String targetFileFullPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/encoded.txt";
         sourceActivity.displayMessage("Uploading " + targetFileFullPath);
         File sceneImageFile = new File(targetFileFullPath);
 
-        long fileSizeInKB = sceneImageFile.length() / 1024;
-        Log.d("CommModule",  String.valueOf(fileSizeInKB));
-
-        if(sceneImageFile.exists()){
-            Log.d("CommModule",  "file exist");
-        }
-        else{
-            Log.d("CommModule",  "file not exist");
-        }
+//        long fileSizeInKB = sceneImageFile.length() / 1024;
+//        Log.d("CommModule",  String.valueOf(fileSizeInKB));
+//
+//        if(sceneImageFile.exists()){
+//            Log.d("CommModule",  "file exist");
+//        }
+//        else{
+//            Log.d("CommModule",  "file not exist");
+//        }
 
 
         String completeUrl = SERVER_IP + "/detect_target";
@@ -34,7 +34,7 @@ public class CommModule {
 
         AndroidNetworking.upload(completeUrl)
                 .setPriority(Priority.MEDIUM)
-                .addMultipartFile("scene_image_file",sceneImageFile)
+                .addMultipartFile("scene_image_file", sceneImageFile)
                 .addMultipartParameter("command_text", command)
                 .build()
                 .getAsString(new StringRequestListener() {
@@ -50,6 +50,7 @@ public class CommModule {
                         sourceActivity.displayMessage(error.getErrorDetail());
                     }
                 });
+
     }
 
     public static void callGestureDetectionApi(int gesture_code, MainActivity sourceActivity) {

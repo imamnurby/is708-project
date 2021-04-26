@@ -7,6 +7,8 @@ import pointing_resolver
 import target_resolver
 import cv2
 import json
+import base64
+from PIL import Image
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
@@ -25,13 +27,25 @@ def detect_target():
             return("image file is not provided")
         else:
             scene_image_file = request.files['scene_image_file']
-            
+            # Save for debugging
+            scene_image_file.save('./temp_image.txt')
+    
     
     command_text = request.form['command_text']
+    
+    # decode scene_image
+    with open('temp_image.txt') as f:
+        lines = f.readlines()
 
-    # Save for debugging
-    # scene_image = scene_image_file
-    scene_image_file.save('./temp_image.jpeg')
+    base64str = ""
+    for element in lines:
+        base64str = base64str + element
+    
+    imgdata = base64.b64decode(base64str)
+    filename = 'temp_image.jpeg'  # I assume you have a way of picking unique filenames
+    with open(filename, 'wb') as f:
+        f.write(imgdata)
+
     scene_image = cv2.imread('./temp_image.jpeg')
     print(f"Image saved. command_text = {command_text}")
         

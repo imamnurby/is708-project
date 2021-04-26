@@ -17,6 +17,7 @@ import android.os.HandlerThread;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.util.Base64;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.PixelCopy;
@@ -27,8 +28,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -134,8 +137,8 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(String.valueOf(this), "Result: " + commandText);
                 sysMsgTextView.setText(sysMsgTextView.getText() + "\n" + "Speech recognition done");
                 takePhoto();
-
                 CommModule.callTargetDetectionApi(commandText, MainActivity.this);
+
             }
 
             @Override
@@ -265,6 +268,20 @@ public class MainActivity extends AppCompatActivity {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 50, fileOutputStream);
         fileOutputStream.flush();
         fileOutputStream.close();
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos); // bm is the bitmap object
+        byte[] b = baos.toByteArray();
+
+        String encodedImage = Base64.encodeToString(b, Base64.DEFAULT);
+        Log.d("saveImageBitmapToDisk()", encodedImage);
+
+        String path = String.valueOf(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES));
+        File gpxfile = new File(path, "encoded.txt");
+        FileWriter writer = new FileWriter(gpxfile);
+        writer.append(encodedImage);
+        writer.flush();
+        writer.close();
     }
 
     public void displayMessage(String s) {
