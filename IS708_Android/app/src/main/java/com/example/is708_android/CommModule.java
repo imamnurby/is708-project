@@ -18,17 +18,6 @@ public class CommModule {
         sourceActivity.displayMessage("Uploading " + targetFileFullPath);
         File sceneImageFile = new File(targetFileFullPath);
 
-//        long fileSizeInKB = sceneImageFile.length() / 1024;
-//        Log.d("CommModule",  String.valueOf(fileSizeInKB));
-//
-//        if(sceneImageFile.exists()){
-//            Log.d("CommModule",  "file exist");
-//        }
-//        else{
-//            Log.d("CommModule",  "file not exist");
-//        }
-
-
         String completeUrl = SERVER_IP + "/detect_target";
         Log.d("CommModule", "Calling target detection API on " + completeUrl);
 
