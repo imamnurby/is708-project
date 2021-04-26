@@ -136,8 +136,17 @@ public class MainActivity extends AppCompatActivity {
                 editText.setText(commandText);
                 Log.d(String.valueOf(this), "Result: " + commandText);
                 sysMsgTextView.setText(sysMsgTextView.getText() + "\n" + "Speech recognition done");
+
                 takePhoto();
-                CommModule.callTargetDetectionApi(commandText, MainActivity.this);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        CommModule.callTargetDetectionApi(commandText, MainActivity.this);
+                        // OR yourTV.setVisibility(View.GONE) to reclaim the space
+                    }
+                }, 10000);
+
+
 
             }
 
@@ -263,23 +272,20 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void saveImageBitmapToDisk(Bitmap bitmap, String targetFileFullPath) throws IOException {
-        File sceneImageFile = new File(targetFileFullPath);
-        FileOutputStream fileOutputStream = new FileOutputStream(sceneImageFile);
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, fileOutputStream);
-        fileOutputStream.flush();
-        fileOutputStream.close();
+//        File sceneImageFile = new File(targetFileFullPath);
+//        FileOutputStream fileOutputStream = new FileOutputStream(sceneImageFile);
+//        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, fileOutputStream);
+//        fileOutputStream.flush();
+//        fileOutputStream.close();
 
         ByteArrayOutputStream binaryArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, binaryArrayOutputStream); // bm is the bitmap object
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, binaryArrayOutputStream); // bm is the bitmap object
         byte[] b = binaryArrayOutputStream.toByteArray();
         String encodedImage = Base64.encodeToString(b, Base64.DEFAULT);
         Log.d("saveImageBitmapToDisk()", encodedImage);
 
         String path = String.valueOf(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES));
         File encodedText = new File(path, "encoded.txt");
-        if(encodedText.exists()){
-            encodedText.delete();
-        }
         FileWriter writer = new FileWriter(encodedText);
         writer.append(encodedImage);
         writer.flush();
