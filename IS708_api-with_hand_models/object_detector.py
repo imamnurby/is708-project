@@ -22,12 +22,12 @@ def detect_objects(scene_image):
     return detected_objects
 
 if __name__ == '__main__':
-    for fname in ['test_image/test_image_01.JPG',
-                  'test_image/test_image_02.JPG',
-                  'test_image/test_image_03.JPG',
-                  'test_image/test_image_04.JPG',
-                  'test_image/test_image_05.JPG',
-                  'test_image/test_image_06.JPG']:   
+    for fname in ['scene_image_train/scene_image_01.JPG',
+                  'scene_image_train/scene_image_02.JPG',
+                  'scene_image_train/scene_image_03.JPG',
+                  'scene_image_train/scene_image_04.JPG',
+                  'scene_image_train/scene_image_05.JPG',
+                  'scene_image_train/scene_image_06.JPG']:   
         try:
             scene_image = cv2.imread(fname)
             objects = detect_objects(scene_image)  
