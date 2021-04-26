@@ -265,20 +265,22 @@ public class MainActivity extends AppCompatActivity {
     public void saveImageBitmapToDisk(Bitmap bitmap, String targetFileFullPath) throws IOException {
         File sceneImageFile = new File(targetFileFullPath);
         FileOutputStream fileOutputStream = new FileOutputStream(sceneImageFile);
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, fileOutputStream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, fileOutputStream);
         fileOutputStream.flush();
         fileOutputStream.close();
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos); // bm is the bitmap object
-        byte[] b = baos.toByteArray();
-
+        ByteArrayOutputStream binaryArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, binaryArrayOutputStream); // bm is the bitmap object
+        byte[] b = binaryArrayOutputStream.toByteArray();
         String encodedImage = Base64.encodeToString(b, Base64.DEFAULT);
         Log.d("saveImageBitmapToDisk()", encodedImage);
 
         String path = String.valueOf(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES));
-        File gpxfile = new File(path, "encoded.txt");
-        FileWriter writer = new FileWriter(gpxfile);
+        File encodedText = new File(path, "encoded.txt");
+        if(encodedText.exists()){
+            encodedText.delete();
+        }
+        FileWriter writer = new FileWriter(encodedText);
         writer.append(encodedImage);
         writer.flush();
         writer.close();
