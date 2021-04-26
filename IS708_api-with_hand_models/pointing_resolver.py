@@ -14,54 +14,6 @@ def resolve_pointing_direction(scene_image):
     List containing coordinates representing a line corresponding to pointing direction 
     of the hand in the scene image
     """
-    # protoFile = "hand/pose_deploy.prototxt"
-    # weightsFile = "hand/pose_iter_102000.caffemodel"
-    # nPoints = 22
-
-    # #frame = cv2.imread("hand.jpg")
-
-    # frameCopy = np.copy(scene_image)
-    # frameWidth = scene_image.shape[1]
-    # frameHeight = scene_image.shape[0]
-    # aspect_ratio = frameWidth/frameHeight
-    # threshold = 0.1
-
-    # t = time.time()
-    # # input image dimensions for the network
-    # inHeight = 736
-    # # inWidth = 368
-    # inWidth = int(((aspect_ratio*inHeight)*8)//8)
-    # net = cv2.dnn.readNetFromCaffe(protoFile, weightsFile)
-
-    # inpBlob = cv2.dnn.blobFromImage(frameCopy, 1.0 / 255, (inWidth, inHeight),
-    #                           (0, 0, 0), swapRB=False, crop=False)
-
-    # net.setInput(inpBlob)
-
-    # output = net.forward()
-    # #print("time taken by network : {:.3f}".format(time.time() - t))
-
-
-    # # Empty list to store the detected keypoints
-    # points = []
-    
-    # for i in range(nPoints):
-    #     # confidence map of corresponding body's part.
-    #     probMap = output[0, i, :, :]
-    #     probMap = cv2.resize(probMap, (frameWidth, frameHeight))
-    
-    #     # Find global maxima of the probMap.
-    #     minVal, prob, minLoc, point = cv2.minMaxLoc(probMap)
-    
-    #     if prob > threshold :
-    #         cv2.circle(frameCopy, (int(point[0]), int(point[1])), 3, (0, 255, 255), thickness=-1, lineType=cv2.FILLED)
-    #         cv2.putText(frameCopy, "{}".format(i), (int(point[0]), int(point[1])), cv2.FONT_HERSHEY_SIMPLEX, .8, (0, 0, 255), 2, lineType=cv2.LINE_AA)
-    
-    #         # Add the point to the list if the probability is greater than the threshold
-    #         points.append([int(point[0]), int(point[1])])
-    #     else :
-    #         points.append(None)
-    # cv2.imwrite("test.jpg",frameCopy)
 
     '''
     TODO: You should implement code to get proper value of gradient and intercept 
