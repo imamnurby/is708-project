@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">IS708 - Android</string>
+    <string name="btn_label">Press</string>
+    <string name="tap_button_to_speak">&lt;-- Tap and hold button to speak</string>
+</resources>
