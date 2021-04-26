@@ -43,7 +43,7 @@ def detect_target():
         base64str = base64str + element
     
     imgdata = base64.b64decode(base64str)
-    filename = 'result_original_file.jpg'  # I assume you have a way of picking unique filenames
+    filename = 'result_original_file.jpg'
     with open(filename, 'wb') as f:
         f.write(imgdata)
 
