@@ -22,7 +22,7 @@ public class CommModule {
         Log.d("CommModule", "Calling target detection API on " + completeUrl);
 
         AndroidNetworking.upload(completeUrl)
-                .setPriority(Priority.MEDIUM)
+                .setPriority(Priority.HIGH)
                 .addMultipartFile("scene_image_file", sceneImageFile)
                 .addMultipartParameter("command_text", command)
                 .build()
