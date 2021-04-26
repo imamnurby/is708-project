@@ -50,7 +50,6 @@ def detect_target():
     scene_image = cv2.imread('./result_original_file.jpg')
     
     detected_objects = object_detector.detect_objects(scene_image)
-    print(detected_objects)
     if detected_objects is None:
         return "No valid objects detected"
     pointing_direction = pointing_resolver.resolve_pointing_direction(scene_image)
