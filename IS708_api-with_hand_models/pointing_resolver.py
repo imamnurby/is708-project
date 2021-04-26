@@ -103,7 +103,7 @@ def resolve_pointing_direction(scene_image):
     # plt.figure(figsize=(10,10))
     # plt.imshow(img)
     # plt.show()
-    cv2.imwrite("test.jpg",img)
+    cv2.imwrite("result_pointing_resolver.jpg",img)
     
     # calculate gradient and slope
     x2, y2 = extTop
