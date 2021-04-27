@@ -9,6 +9,10 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -39,7 +43,6 @@ import com.androidnetworking.*;
 import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.math.Vector3;
-import com.google.ar.sceneform.rendering.Color;
 import com.google.ar.sceneform.rendering.MaterialFactory;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.ShapeFactory;
@@ -70,6 +73,8 @@ public class MainActivity extends AppCompatActivity {
     private TransformableNode responseObjectNode;
     private String targetScreenArea = null;
 
+
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
         downArrow = findViewById(R.id.downArrowImage);
         micButton = findViewById(R.id.micButton);
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
+
 
         final Intent speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -182,6 +188,7 @@ public class MainActivity extends AppCompatActivity {
         // Hide instruction animation
         fragment.getPlaneDiscoveryController().hide();
         fragment.getPlaneDiscoveryController().setInstructionView(null);
+
     }
 
     @Override
@@ -223,6 +230,40 @@ public class MainActivity extends AppCompatActivity {
          rendered bounding box to facilitate multiple runs without creating clutter
         on camera preview
          */
+        String temp1 = boundingBoxJson.replace("[", "");
+        String temp2 = temp1.replace("]", "");
+        String temp3 = temp2.replace(" ", "");
+        String[] boundingBox = temp3.split("\\,");
+
+        int xLeft = Integer.valueOf((boundingBox[1]));
+        int xRight = Integer.valueOf(boundingBox[3]);
+        int yTop = Integer.valueOf(boundingBox[2]);
+        int yBot = Integer.valueOf(boundingBox[4]);
+
+        Log.d("XXX Left", Float.toString(xLeft));
+        Log.d("XXX Right", Float.toString(xRight));
+        Log.d("XXX Top", Float.toString(yTop));
+        Log.d("XXX Bot", Float.toString(yBot));
+
+        ArSceneView arSceneView = fragment.getArSceneView();
+        // Create a bitmap the size of the scene view.
+        final Bitmap bitmap = Bitmap.createBitmap(arSceneView.getWidth(), arSceneView.getHeight(), Bitmap.Config.ARGB_8888);
+
+        ImageView bbox=(ImageView) findViewById(R.id.bbox);
+
+        Canvas canvas = new Canvas(bitmap);
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(10);
+        paint.setColor(Color.parseColor("#00FF00"));
+        Rect rec = new Rect();
+        rec.top=  yTop;
+        rec.left= xLeft;
+        rec.bottom =  yBot;
+        rec.right =  xRight;
+        canvas.drawRect(rec,paint);
+        bbox.setImageBitmap(bitmap);
+
     }
 
     public void respondToGesture(String gesture) {
@@ -238,6 +279,9 @@ public class MainActivity extends AppCompatActivity {
         editText.setText(R.string.tap_button_to_speak);
         sysMsgTextView.setText("");
         targetScreenArea = null;
+        ImageView bbox=(ImageView) findViewById(R.id.bbox);
+        bbox.setImageResource(0);
+
     }
     // Camera
     private void takePhoto() {
