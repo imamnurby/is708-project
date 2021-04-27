@@ -36,28 +36,29 @@
         android:id="@+id/upArrowImage"
         android:layout_width="65dp"
         android:layout_height="50dp"
-        android:layout_marginStart="5dp"
-        android:layout_marginBottom="25dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
         android:onClick="clickUpArrow"
         app:layout_constraintBottom_toTopOf="@+id/btnResetApp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.058"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.985"
+        app:layout_constraintVertical_bias="1.0"
         app:srcCompat="@android:drawable/arrow_up_float" />
 
     <ImageView
         android:id="@+id/downArrowImage"
         android:layout_width="65dp"
         android:layout_height="50dp"
-        android:layout_marginStart="5dp"
-        android:layout_marginBottom="124dp"
+        android:layout_marginStart="16dp"
         android:onClick="clickDownArrow"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/sceneform_fragment"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.058"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/sceneform_fragment"
+        app:layout_constraintVertical_bias="1.0"
         app:srcCompat="@android:drawable/arrow_down_float" />
 
     <ImageButton
@@ -71,12 +72,13 @@
         app:layout_constraintEnd_toStartOf="@+id/text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sceneform_fragment"
+        app:layout_constraintVertical_bias="0.45"
         app:srcCompat="@android:drawable/btn_radio" />
 
     <TextView
         android:id="@+id/sysMessageTextView"
-        android:layout_width="280dp"
-        android:layout_height="67dp"
+        android:layout_width="273dp"
+        android:layout_height="91dp"
         android:layout_marginStart="25dp"
         android:layout_marginEnd="5dp"
         android:text="TextView"
@@ -85,18 +87,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/downArrowImage"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.82" />
+        app:layout_constraintVertical_bias="0.8" />
 
     <ImageView
         android:id="@+id/btnResetApp"
         android:layout_width="65dp"
         android:layout_height="50dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginBottom="25dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
         android:onClick="resetAppUi"
         app:layout_constraintBottom_toTopOf="@+id/downArrowImage"
         app:layout_constraintEnd_toStartOf="@+id/sysMessageTextView"
-        app:layout_constraintHorizontal_bias="0.285"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
 
