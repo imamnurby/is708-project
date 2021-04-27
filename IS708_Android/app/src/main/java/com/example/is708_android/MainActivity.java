@@ -235,10 +235,10 @@ public class MainActivity extends AppCompatActivity {
         String temp3 = temp2.replace(" ", "");
         String[] boundingBox = temp3.split("\\,");
 
-        int xLeft = Integer.valueOf((boundingBox[1]));
-        int xRight = Integer.valueOf(boundingBox[3]);
-        int yTop = Integer.valueOf(boundingBox[2]);
-        int yBot = Integer.valueOf(boundingBox[4]);
+        float xLeft = Float.parseFloat((boundingBox[1]));
+        float xRight = Float.parseFloat(boundingBox[3]);
+        float yTop = Float.parseFloat(boundingBox[2]);
+        float yBot = Float.parseFloat(boundingBox[4]);
 
         Log.d("XXX Left", Float.toString(xLeft));
         Log.d("XXX Right", Float.toString(xRight));
@@ -246,8 +246,17 @@ public class MainActivity extends AppCompatActivity {
         Log.d("XXX Bot", Float.toString(yBot));
 
         ArSceneView arSceneView = fragment.getArSceneView();
-        // Create a bitmap the size of the scene view.
         final Bitmap bitmap = Bitmap.createBitmap(arSceneView.getWidth(), arSceneView.getHeight(), Bitmap.Config.ARGB_8888);
+
+        float middlePoint = arSceneView.getWidth()/2;
+        float centroidX = (xLeft + xRight)/2;
+
+        if(centroidX < middlePoint) {
+            targetScreenArea = "LEFT";
+        } else {
+            targetScreenArea = "RIGHT";
+        }
+        Log.d("targetScreenArea", targetScreenArea);
 
         ImageView bbox=(ImageView) findViewById(R.id.bbox);
 
@@ -256,11 +265,13 @@ public class MainActivity extends AppCompatActivity {
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(10);
         paint.setColor(Color.parseColor("#00FF00"));
+
         Rect rec = new Rect();
-        rec.top=  yTop;
-        rec.left= xLeft;
-        rec.bottom =  yBot;
-        rec.right =  xRight;
+        rec.top=  (int) yTop;
+        rec.left= (int) xLeft;
+        rec.bottom = (int) yBot;
+        rec.right = (int) xRight;
+
         canvas.drawRect(rec,paint);
         bbox.setImageBitmap(bitmap);
 
