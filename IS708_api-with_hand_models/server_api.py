@@ -8,6 +8,7 @@ import target_resolver
 import cv2
 import json
 import base64
+import time
 from PIL import Image
 
 app = flask.Flask(__name__)
@@ -23,6 +24,8 @@ def detect_target():
     """API method 1: detection of target object
     """
     if request.method == 'POST':
+        
+        
         if 'scene_image_file' not in request.files:
             return("image file is not provided")
         else:
@@ -37,16 +40,14 @@ def detect_target():
     # decode scene_image
     with open('result_undecoded.txt') as f:
         lines = f.readlines()
-
-    base64str = ""
-    for element in lines:
-        base64str = base64str + element
+        base64str = ""
+        for element in lines:
+            base64str = base64str + element
+        imgdata = base64.b64decode(base64str)
+        filename = 'result_original_file.jpg'
+        with open(filename, 'wb') as f2:
+            f2.write(imgdata)
     
-    imgdata = base64.b64decode(base64str)
-    filename = 'result_original_file.jpg'
-    with open(filename, 'wb') as f:
-        f.write(imgdata)
-
     scene_image = cv2.imread('./result_original_file.jpg')
     
     detected_objects = object_detector.detect_objects(scene_image)
