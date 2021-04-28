@@ -230,6 +230,8 @@ public class MainActivity extends AppCompatActivity {
          rendered bounding box to facilitate multiple runs without creating clutter
         on camera preview
          */
+        sysMsgTextView.setText("Target bounding box:\n" + boundingBoxJson);
+
         String temp1 = boundingBoxJson.replace("[", "");
         String temp2 = temp1.replace("]", "");
         String temp3 = temp2.replace(" ", "");
@@ -263,7 +265,7 @@ public class MainActivity extends AppCompatActivity {
         Canvas canvas = new Canvas(bitmap);
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(10);
+        paint.setStrokeWidth(5);
         paint.setColor(Color.parseColor("#00FF00"));
 
         Rect rec = new Rect();
