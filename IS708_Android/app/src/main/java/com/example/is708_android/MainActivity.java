@@ -40,6 +40,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
+
 import com.androidnetworking.*;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.Frame;
@@ -49,7 +51,12 @@ import com.google.ar.core.exceptions.CameraNotAvailableException;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.assets.RenderableSource;
+import com.google.ar.sceneform.math.Vector3;
+import com.google.ar.sceneform.rendering.Material;
+import com.google.ar.sceneform.rendering.MaterialFactory;
 import com.google.ar.sceneform.rendering.ModelRenderable;
+import com.google.ar.sceneform.rendering.Renderable;
+import com.google.ar.sceneform.rendering.ShapeFactory;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 
@@ -77,10 +84,13 @@ public class MainActivity extends AppCompatActivity {
     private String targetScreenArea = null;
     private Session session;
     private Frame frame;
-    private ModelRenderable andyRenderable;
+    private CompletableFuture<Void> dummy;
     private AnchorNode anchorNode;
     private static final String GLTF_ASSET = "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF/Duck.gltf";
     private float[] finalpos;
+    private ModelRenderable model;
+
+
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -194,26 +204,7 @@ public class MainActivity extends AppCompatActivity {
         fragment.getPlaneDiscoveryController().hide();
         fragment.getPlaneDiscoveryController().setInstructionView(null);
 
-        ModelRenderable.builder()
-                .setSource(this, RenderableSource.builder().setSource(
-                        this,
-                        Uri.parse(GLTF_ASSET),
-                        RenderableSource.SourceType.GLTF2)
-                        .setScale(0.3f)
-                        .setRecenterMode(RenderableSource.RecenterMode.ROOT)
-                        .build())
-                .setRegistryId(GLTF_ASSET)
-                .build()
-                .thenAccept(renderable -> andyRenderable = renderable)
-                .exceptionally(
-                        throwable -> {
-                            Toast toast =
-                                    Toast.makeText(this, "Unable to load renderable " +
-                                            GLTF_ASSET, Toast.LENGTH_LONG);
-                            toast.setGravity(Gravity.CENTER, 0, 0);
-                            toast.show();
-                            return null;
-                        });
+
 
     }
 
@@ -307,18 +298,56 @@ public class MainActivity extends AppCompatActivity {
 
     public void respondToGesture(String gesture) {
         /* TODO: You should implement this method */
+        String gest = gesture.substring(1, gesture.length() - 1);
+        sysMsgTextView.setText("Gesture:" + gest);
 
-        float[] leftInit = {-0.2f, 0, -1f};
-        float[] rightInit = {0.2f, 0, -1f};
+        // load model
+        float[] leftInit;
+        float[] rightInit;
+        float[] finalpos;
+        if (gest.equals("Nodding")){
+            ModelRenderable.builder()
+                    .setSource(this, R.raw.export_71)
+                    .build()
+                    .thenAccept(renderable -> model = renderable)
+                    .exceptionally(
+                            throwable -> {
+                                Toast toast =
+                                        Toast.makeText(this, "Unable to load andy renderable", Toast.LENGTH_LONG);
+                                toast.setGravity(Gravity.CENTER, 0, 0);
+                                toast.show();
+                                return null;
+                            });
+            finalpos = new float[]{0, 0, -2f};
+            leftInit = new float[]{-0.5f, 0, -2f};
+            rightInit = new float[]{0.3f, 0, -2f};
+        } else {
+            ModelRenderable.builder()
+                    .setSource(this, R.raw.thumbsup)
+                    .build()
+                    .thenAccept(renderable -> model = renderable)
+                    .exceptionally(
+                            throwable -> {
+                                Toast toast =
+                                        Toast.makeText(this, "Unable to load andy renderable", Toast.LENGTH_LONG);
+                                toast.setGravity(Gravity.CENTER, 0, 0);
+                                toast.show();
+                                return null;
+                            });
+            finalpos = new float[]{0, 0, -6f};
+            leftInit = new float[]{-1.5f, 0, -6f};
+            rightInit = new float[]{1f, 0, -6f};
+        }
         float[] rotation = {0, 0, 0, 0};
-        float[] finalpos = {0, 0, -1f};
+
+
+        // get current frame and translate the initial coordinate to the current frame
         session = fragment.getArSceneView().getSession();
         try {
             frame = session.update();
         } catch (CameraNotAvailableException e) {
             e.printStackTrace();
         }
-
         Pose pose = frame.getAndroidSensorPose();
         if(targetScreenArea == "LEFT"){
             finalpos = pose.rotateVector(leftInit);
@@ -334,12 +363,16 @@ public class MainActivity extends AppCompatActivity {
         TransformableNode transformableNode = new TransformableNode(fragment.getTransformationSystem());
         transformableNode.setParent(anchorNode);
         fragment.getArSceneView().getScene().addChild(anchorNode);
-        transformableNode.setRenderable(andyRenderable);
-        transformableNode.select();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                transformableNode.setRenderable(model);
+                transformableNode.select();
+            }
+        }, 1000);
+
     }
-
-
-
+    
     public void resetAppUi(View view){
         if(null != responseObjectNode) {
             responseObjectNode.setParent(null);

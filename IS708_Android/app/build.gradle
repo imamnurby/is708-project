@@ -45,3 +45,15 @@ dependencies {
     implementation "com.google.ar.sceneform:assets:1.15.0"
 
 }
+
+apply plugin: 'com.google.ar.sceneform.plugin'
+sceneform.asset('sampledata/thumbsup.gltf',
+        'default',
+        'sampledata/thumbsup.sfa',
+        'src/main/res/raw/thumbsup')
+
+
+sceneform.asset('sampledata/export_71.gltf',
+        'default',
+        'sampledata/export_71.sfa',
+        'src/main/res/raw/export_71')
