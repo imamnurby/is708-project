@@ -13,6 +13,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -23,6 +24,7 @@ import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.PixelCopy;
 import android.view.View;
@@ -38,10 +40,19 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import com.androidnetworking.*;
+import com.google.ar.core.Anchor;
+import com.google.ar.core.HitResult;
+import com.google.ar.core.Plane;
+import com.google.ar.core.Pose;
+import com.google.ar.core.Session;
+import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.ArSceneView;
+import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.Scene;
+import com.google.ar.sceneform.assets.RenderableSource;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.MaterialFactory;
 import com.google.ar.sceneform.rendering.ModelRenderable;
@@ -73,7 +84,19 @@ public class MainActivity extends AppCompatActivity {
     private TransformableNode responseObjectNode;
     private String targetScreenArea = null;
 
+    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final double MIN_OPENGL_VERSION = 3.0;
+    private  static final int MAX_ANCHORS = 2;
 
+    private ArFragment arFragment;
+    private ModelRenderable andyRenderable;
+    private ModelRenderable foxRenderable;
+    private AnchorNode anchorNode;
+    private List<AnchorNode> anchorNodeList = new ArrayList<>();
+    private Integer numberOfAnchors = 0;
+    private AnchorNode currentSelectedAnchorNode = null;
+    private Node nodeForLine;
+    private static final String GLTF_ASSET = "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF/Duck.gltf";
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -185,9 +208,50 @@ public class MainActivity extends AppCompatActivity {
 
         // AR
         fragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
+
         // Hide instruction animation
         fragment.getPlaneDiscoveryController().hide();
         fragment.getPlaneDiscoveryController().setInstructionView(null);
+
+        ModelRenderable.builder()
+                .setSource(this, RenderableSource.builder().setSource(
+                        this,
+                        Uri.parse(GLTF_ASSET),
+                        RenderableSource.SourceType.GLTF2)
+                        .setScale(0.1f)
+                        .setRecenterMode(RenderableSource.RecenterMode.ROOT)
+                        .build())
+                .setRegistryId(GLTF_ASSET)
+                .build()
+                .thenAccept(renderable -> andyRenderable = renderable)
+                .exceptionally(
+                        throwable -> {
+                            Toast toast =
+                                    Toast.makeText(this, "Unable to load renderable " +
+                                            GLTF_ASSET, Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+                            return null;
+                        });
+
+//        fragment.setOnTapArPlaneListener(
+//                (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
+//                    if (andyRenderable == null) {
+//                        return;
+//                    }
+//
+//                    // Create the Anchor.
+//                    Anchor anchor = hitResult.createAnchor();
+//                    AnchorNode anchorNode = new AnchorNode(anchor);
+//                    anchorNode.setParent(fragment.getArSceneView().getScene());
+//
+//                    // Create the transformable andy and add it to the anchor.
+//                    TransformableNode andy = new TransformableNode(fragment.getTransformationSystem());
+//                    andy.setParent(anchorNode);
+//                    andy.setRenderable(andyRenderable);
+//                    andy.select();
+//                });
+
 
     }
 
@@ -281,6 +345,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void respondToGesture(String gesture) {
         /* TODO: You should implement this method */
+//        Session session = arFragment.getArSceneView().getSession();
+//        float[] pos = { 0, 0, -1 };
+//        float[] rotation = { 0, 0, 0, 1 };
+//        Anchor anchor =  session.createAnchor(new Pose(pos, rotation));
+//        anchorNode = new AnchorNode(anchor);
+//        anchorNode.setRenderable(andyRenderable);
+//        anchorNode.setParent(arFragment.getArSceneView().getScene());
     }
 
     public void resetAppUi(View view){
