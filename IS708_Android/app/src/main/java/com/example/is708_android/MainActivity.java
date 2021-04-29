@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
@@ -19,6 +20,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.SystemClock;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -44,10 +46,13 @@ import java.util.List;
 import java.util.Locale;
 import com.androidnetworking.*;
 import com.google.ar.core.Anchor;
+import com.google.ar.core.Frame;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
 import com.google.ar.core.Pose;
 import com.google.ar.core.Session;
+import com.google.ar.core.Trackable;
+import com.google.ar.core.exceptions.CameraNotAvailableException;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.Node;
@@ -97,6 +102,10 @@ public class MainActivity extends AppCompatActivity {
     private AnchorNode currentSelectedAnchorNode = null;
     private Node nodeForLine;
     private static final String GLTF_ASSET = "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF/Duck.gltf";
+
+    private Session session;
+    private Frame frame;
+    private Vector3 vector;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -343,16 +352,105 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
     public void respondToGesture(String gesture) {
         /* TODO: You should implement this method */
-//        Session session = arFragment.getArSceneView().getSession();
-//        float[] pos = { 0, 0, -1 };
+
+        ArSceneView arSceneView = fragment.getArSceneView();
+        int width = arSceneView.getWidth()/4;
+        int height = arSceneView.getHeight()/2;
+        session = fragment.getArSceneView().getSession();
+
+        try {
+            frame = session.update();
+        } catch (CameraNotAvailableException e) {
+            e.printStackTrace();
+        }
+
+        Pose pose = frame.getAndroidSensorPose();
+        float qw = pose.qw();
+        float qx = pose.qx();
+        float qz = pose.qz();
+        float qy = pose.qy();
+
+        float x = pose.tx();
+        float y = pose.ty();
+
+        float[] pos = {0, 0, -1f};
+        float[] rotation = {0, 0, 0, 0};
+
+        float[] finalpos = pose.rotateVector(pos);
+
+        Anchor anchor =  session.createAnchor(new Pose(finalpos, rotation));
+        anchorNode = new AnchorNode(anchor);
+        anchorNode.setParent(fragment.getArSceneView().getScene());
+        TransformableNode transformableNode = new TransformableNode(fragment.getTransformationSystem());
+        transformableNode.setParent(anchorNode);
+        fragment.getArSceneView().getScene().addChild(anchorNode);
+        transformableNode.setRenderable(andyRenderable);
+        transformableNode.select();
+
+//        Point point = new Point(width, height);
+//        if (frame != null){
+//            List<HitResult> hits = frame.hitTest((float) point.x, (float) point.y);
+//
+//            for (int i = 0; i < hits.size(); i++){
+//                Trackable trackable = hits.get(i).getTrackable();
+//                if (trackable instanceof Plane && ((Plane) trackable).isPoseInPolygon(hits.get(i).getHitPose())){
+//                    AnchorNode anchorNode = new AnchorNode(hits.get(i).createAnchor());
+//                    TransformableNode transformableNode = new TransformableNode(fragment.getTransformationSystem());
+//                    transformableNode.setRenderable(andyRenderable);
+//                    transformableNode.setParent(anchorNode);
+//                    fragment.getArSceneView().getScene().addChild(anchorNode);
+//                    transformableNode.select();
+//                }
+//
+//
+//            }
+//        }
+
+
+
+//        Session session = fragment.getArSceneView().getSession();
+//        float[] pos = { 0, 0, -1f };
 //        float[] rotation = { 0, 0, 0, 1 };
 //        Anchor anchor =  session.createAnchor(new Pose(pos, rotation));
 //        anchorNode = new AnchorNode(anchor);
-//        anchorNode.setRenderable(andyRenderable);
-//        anchorNode.setParent(arFragment.getArSceneView().getScene());
+//        anchorNode.setParent(fragment.getArSceneView().getScene());
+//        TransformableNode transformableNode = new TransformableNode(fragment.getTransformationSystem());
+//        transformableNode.setParent(anchorNode);
+//        transformableNode.setRenderable(andyRenderable);
+
+
+
+
+
+//        Frame frame = fragment.getArSceneView().getArFrame();
+//
+//
+//
+//
+//        Point point = new Point(width, height);
+//        if (frame != null){
+//            List<HitResult> hits = frame.hitTest((float) point.x, (float) point.y);
+//
+//            for (int i = 0; i < hits.size(); i++){
+//                Trackable trackable = hits.get(i).getTrackable();
+//                if (trackable instanceof Plane && ((Plane) trackable).isPoseInPolygon(hits.get(i).getHitPose())){
+//                    AnchorNode anchorNode = new AnchorNode(hits.get(i).createAnchor());
+//                    TransformableNode transformableNode = new TransformableNode(fragment.getTransformationSystem());
+//                    transformableNode.setRenderable(andyRenderable);
+//                    transformableNode.setParent(anchorNode);
+//                    fragment.getArSceneView().getScene().addChild(anchorNode);
+//                    transformableNode.select();
+//                }
+//
+//
+//            }
+//        }
     }
+
+
 
     public void resetAppUi(View view){
         if(null != responseObjectNode) {
