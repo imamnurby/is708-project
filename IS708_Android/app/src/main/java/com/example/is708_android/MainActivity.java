@@ -12,7 +12,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
@@ -20,7 +19,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.SystemClock;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -38,30 +36,20 @@ import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import com.androidnetworking.*;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.Frame;
-import com.google.ar.core.HitResult;
-import com.google.ar.core.Plane;
 import com.google.ar.core.Pose;
 import com.google.ar.core.Session;
-import com.google.ar.core.Trackable;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.ArSceneView;
-import com.google.ar.sceneform.Node;
-import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.assets.RenderableSource;
-import com.google.ar.sceneform.math.Vector3;
-import com.google.ar.sceneform.rendering.MaterialFactory;
 import com.google.ar.sceneform.rendering.ModelRenderable;
-import com.google.ar.sceneform.rendering.ShapeFactory;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 
@@ -84,28 +72,15 @@ public class MainActivity extends AppCompatActivity {
     private TextView sysMsgTextView;
 
     // AR
-    private ModelRenderable gestureResponseRenderable;
     private ArFragment fragment;
     private TransformableNode responseObjectNode;
     private String targetScreenArea = null;
-
-    private static final String TAG = MainActivity.class.getSimpleName();
-    private static final double MIN_OPENGL_VERSION = 3.0;
-    private  static final int MAX_ANCHORS = 2;
-
-    private ArFragment arFragment;
-    private ModelRenderable andyRenderable;
-    private ModelRenderable foxRenderable;
-    private AnchorNode anchorNode;
-    private List<AnchorNode> anchorNodeList = new ArrayList<>();
-    private Integer numberOfAnchors = 0;
-    private AnchorNode currentSelectedAnchorNode = null;
-    private Node nodeForLine;
-    private static final String GLTF_ASSET = "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF/Duck.gltf";
-
     private Session session;
     private Frame frame;
-    private Vector3 vector;
+    private ModelRenderable andyRenderable;
+    private AnchorNode anchorNode;
+    private static final String GLTF_ASSET = "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF/Duck.gltf";
+    private float[] finalpos;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -183,9 +158,6 @@ public class MainActivity extends AppCompatActivity {
                         // OR yourTV.setVisibility(View.GONE) to reclaim the space
                     }
                 }, 5000);
-
-
-
             }
 
             @Override
@@ -227,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
                         this,
                         Uri.parse(GLTF_ASSET),
                         RenderableSource.SourceType.GLTF2)
-                        .setScale(0.1f)
+                        .setScale(0.3f)
                         .setRecenterMode(RenderableSource.RecenterMode.ROOT)
                         .build())
                 .setRegistryId(GLTF_ASSET)
@@ -242,25 +214,6 @@ public class MainActivity extends AppCompatActivity {
                             toast.show();
                             return null;
                         });
-
-//        fragment.setOnTapArPlaneListener(
-//                (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
-//                    if (andyRenderable == null) {
-//                        return;
-//                    }
-//
-//                    // Create the Anchor.
-//                    Anchor anchor = hitResult.createAnchor();
-//                    AnchorNode anchorNode = new AnchorNode(anchor);
-//                    anchorNode.setParent(fragment.getArSceneView().getScene());
-//
-//                    // Create the transformable andy and add it to the anchor.
-//                    TransformableNode andy = new TransformableNode(fragment.getTransformationSystem());
-//                    andy.setParent(anchorNode);
-//                    andy.setRenderable(andyRenderable);
-//                    andy.select();
-//                });
-
 
     }
 
@@ -352,15 +305,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
     public void respondToGesture(String gesture) {
         /* TODO: You should implement this method */
 
-        ArSceneView arSceneView = fragment.getArSceneView();
-        int width = arSceneView.getWidth()/4;
-        int height = arSceneView.getHeight()/2;
+        float[] leftInit = {-0.2f, 0, -1f};
+        float[] rightInit = {0.2f, 0, -1f};
+        float[] rotation = {0, 0, 0, 0};
+        float[] finalpos = {0, 0, -1f};
         session = fragment.getArSceneView().getSession();
-
         try {
             frame = session.update();
         } catch (CameraNotAvailableException e) {
@@ -368,18 +320,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         Pose pose = frame.getAndroidSensorPose();
-        float qw = pose.qw();
-        float qx = pose.qx();
-        float qz = pose.qz();
-        float qy = pose.qy();
-
-        float x = pose.tx();
-        float y = pose.ty();
-
-        float[] pos = {0, 0, -1f};
-        float[] rotation = {0, 0, 0, 0};
-
-        float[] finalpos = pose.rotateVector(pos);
+        if(targetScreenArea == "LEFT"){
+            finalpos = pose.rotateVector(leftInit);
+        } else if(targetScreenArea == "RIGHT"){
+            finalpos = pose.rotateVector(rightInit);
+        } else {
+            finalpos = pose.rotateVector(finalpos);
+        }
 
         Anchor anchor =  session.createAnchor(new Pose(finalpos, rotation));
         anchorNode = new AnchorNode(anchor);
@@ -389,65 +336,6 @@ public class MainActivity extends AppCompatActivity {
         fragment.getArSceneView().getScene().addChild(anchorNode);
         transformableNode.setRenderable(andyRenderable);
         transformableNode.select();
-
-//        Point point = new Point(width, height);
-//        if (frame != null){
-//            List<HitResult> hits = frame.hitTest((float) point.x, (float) point.y);
-//
-//            for (int i = 0; i < hits.size(); i++){
-//                Trackable trackable = hits.get(i).getTrackable();
-//                if (trackable instanceof Plane && ((Plane) trackable).isPoseInPolygon(hits.get(i).getHitPose())){
-//                    AnchorNode anchorNode = new AnchorNode(hits.get(i).createAnchor());
-//                    TransformableNode transformableNode = new TransformableNode(fragment.getTransformationSystem());
-//                    transformableNode.setRenderable(andyRenderable);
-//                    transformableNode.setParent(anchorNode);
-//                    fragment.getArSceneView().getScene().addChild(anchorNode);
-//                    transformableNode.select();
-//                }
-//
-//
-//            }
-//        }
-
-
-
-//        Session session = fragment.getArSceneView().getSession();
-//        float[] pos = { 0, 0, -1f };
-//        float[] rotation = { 0, 0, 0, 1 };
-//        Anchor anchor =  session.createAnchor(new Pose(pos, rotation));
-//        anchorNode = new AnchorNode(anchor);
-//        anchorNode.setParent(fragment.getArSceneView().getScene());
-//        TransformableNode transformableNode = new TransformableNode(fragment.getTransformationSystem());
-//        transformableNode.setParent(anchorNode);
-//        transformableNode.setRenderable(andyRenderable);
-
-
-
-
-
-//        Frame frame = fragment.getArSceneView().getArFrame();
-//
-//
-//
-//
-//        Point point = new Point(width, height);
-//        if (frame != null){
-//            List<HitResult> hits = frame.hitTest((float) point.x, (float) point.y);
-//
-//            for (int i = 0; i < hits.size(); i++){
-//                Trackable trackable = hits.get(i).getTrackable();
-//                if (trackable instanceof Plane && ((Plane) trackable).isPoseInPolygon(hits.get(i).getHitPose())){
-//                    AnchorNode anchorNode = new AnchorNode(hits.get(i).createAnchor());
-//                    TransformableNode transformableNode = new TransformableNode(fragment.getTransformationSystem());
-//                    transformableNode.setRenderable(andyRenderable);
-//                    transformableNode.setParent(anchorNode);
-//                    fragment.getArSceneView().getScene().addChild(anchorNode);
-//                    transformableNode.select();
-//                }
-//
-//
-//            }
-//        }
     }
 
 
@@ -476,6 +364,7 @@ public class MainActivity extends AppCompatActivity {
         // Create a handler thread to offload the processing of the image.
         final HandlerThread handlerThread = new HandlerThread("PixelCopier");
         handlerThread.start();
+        
         // Make the request to copy.
         PixelCopy.request(arSceneView, bitmap, (copyResult) -> {
             if (copyResult == PixelCopy.SUCCESS) {
@@ -498,12 +387,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void saveImageBitmapToDisk(Bitmap bitmap, String targetFileFullPath) throws IOException {
-//        File sceneImageFile = new File(targetFileFullPath);
-//        FileOutputStream fileOutputStream = new FileOutputStream(sceneImageFile);
-//        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, fileOutputStream);
-//        fileOutputStream.flush();
-//        fileOutputStream.close();
-
         ByteArrayOutputStream binaryArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 50, binaryArrayOutputStream); // bm is the bitmap object
         byte[] b = binaryArrayOutputStream.toByteArray();
