@@ -35,11 +35,6 @@ def resolve_target(scene_image, detected_objects, pointing_direction, command_te
     if len(distance_l) > 3:
         distance_l = distance_l[0:3]
     
-    # extract wordlist
-    with open('predefined_dict.txt') as f:
-        lines = f.readlines()
-        wordlist = [word for word in lines]
-
     # process command text
     if command_text != None:
         doc = nlp(command_text)
