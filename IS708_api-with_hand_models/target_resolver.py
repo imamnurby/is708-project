@@ -35,10 +35,19 @@ def resolve_target(scene_image, detected_objects, pointing_direction, command_te
     if len(distance_l) > 3:
         distance_l = distance_l[0:3]
     
+    obj_l = []
+    # extract wordlist
+    with open('predefined_dict.txt') as f:
+        lines = f.readlines()
+        wordlist = [word.strip("\n") for word in lines]
+        # print(wordlist)
     # process command text
     if command_text != None:
-        doc = nlp(command_text)
-        obj_l = [token.text for token in doc  if token.pos_ == "NOUN"]
+        if command_text in wordlist:
+            obj_l.append(command_text)
+        else:
+            doc = nlp(command_text)
+            obj_l = [token.text for token in doc  if token.pos_ == "NOUN"]
         temp_l = []
         print(f"object list contains {obj_l}")
         
