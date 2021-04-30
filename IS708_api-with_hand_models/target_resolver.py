@@ -35,16 +35,18 @@ def resolve_target(scene_image, detected_objects, pointing_direction, command_te
     if len(distance_l) > 3:
         distance_l = distance_l[0:3]
     
-    # extract object from command text
+    # extract wordlist
+    with open('predefined_dict.txt') as f:
+        lines = f.readlines()
+        wordlist = [word for word in lines]
+
+    # process command text
     if command_text != None:
         doc = nlp(command_text)
-        obj_l = []
-        obj_l = [token.text for token in doc if token.dep_ == "dobj"]
-        if len(obj_l) == 0:
-            obj_l = [token.text for token in doc if token.tag_ == "NN"]
-        
+        obj_l = [token.text for token in doc  if token.pos_ == "NOUN"]
         temp_l = []
-
+        print(f"object list contains {obj_l}")
+        
         # check if there is an object that match the extracted obj from command text
         for obj_name, dist, coordinate in (distance_l):
             obj_name_l = obj_name.split()
@@ -52,8 +54,8 @@ def resolve_target(scene_image, detected_objects, pointing_direction, command_te
                 if token in obj_l:
                     temp_l.append((obj_name, dist, coordinate))
                     break
-
-        # if somehow the command input are invalid, just return object with closest distance
+        
+        # if somehow the command input are invalid, just return object with the least distance
         if len(temp_l) == 0:
             obj_out = min(distance_l, key=lambda tup: tup[1])
         
@@ -64,15 +66,13 @@ def resolve_target(scene_image, detected_objects, pointing_direction, command_te
         # command input valid and only one object match with the command input
         else:
             obj_out = (temp_l[0])
-    
+
     else:   
         obj_out = min(distance_l, key=lambda tup: tup[1])
     
     obj_out = (obj_out[0], obj_out[-1])
-    
     target = [obj_out[0],obj_out[-1]]
 
-    
     return target
 	
 if __name__ == '__main__':
