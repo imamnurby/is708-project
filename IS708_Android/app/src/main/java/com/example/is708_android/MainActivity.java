@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
                         CommModule.callTargetDetectionApi(commandText, MainActivity.this);
                         // OR yourTV.setVisibility(View.GONE) to reclaim the space
                     }
-                }, 5000);
+                }, 2000);
             }
 
             @Override
