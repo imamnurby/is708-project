@@ -13,7 +13,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -39,6 +38,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
@@ -50,13 +50,10 @@ import com.google.ar.core.Session;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.ArSceneView;
-import com.google.ar.sceneform.assets.RenderableSource;
-import com.google.ar.sceneform.math.Vector3;
-import com.google.ar.sceneform.rendering.Material;
-import com.google.ar.sceneform.rendering.MaterialFactory;
+import com.google.ar.sceneform.Camera;
+import com.google.ar.sceneform.Node;
+import com.google.ar.sceneform.Sun;
 import com.google.ar.sceneform.rendering.ModelRenderable;
-import com.google.ar.sceneform.rendering.Renderable;
-import com.google.ar.sceneform.rendering.ShapeFactory;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 
@@ -203,9 +200,6 @@ public class MainActivity extends AppCompatActivity {
         // Hide instruction animation
         fragment.getPlaneDiscoveryController().hide();
         fragment.getPlaneDiscoveryController().setInstructionView(null);
-
-
-
     }
 
     @Override
@@ -338,8 +332,8 @@ public class MainActivity extends AppCompatActivity {
             leftInit = new float[]{-1.5f, 0, -6f};
             rightInit = new float[]{1f, 0, -6f};
         }
-        float[] rotation = {0, 0, 0, 0};
 
+        float[] rotation = {0, 0, 0, 0};
 
         // get current frame and translate the initial coordinate to the current frame
         session = fragment.getArSceneView().getSession();
@@ -372,7 +366,7 @@ public class MainActivity extends AppCompatActivity {
         }, 1000);
 
     }
-    
+
     public void resetAppUi(View view){
         if(null != responseObjectNode) {
             responseObjectNode.setParent(null);
@@ -384,8 +378,24 @@ public class MainActivity extends AppCompatActivity {
         targetScreenArea = null;
         ImageView bbox=(ImageView) findViewById(R.id.bbox);
         bbox.setImageResource(0);
+        onClear();
 
     }
+
+    private void onClear() {
+        List<Node> children = new ArrayList<>(fragment.getArSceneView().getScene().getChildren());
+        for (Node node : children) {
+            if (node instanceof AnchorNode) {
+                if (((AnchorNode) node).getAnchor() != null) {
+                    ((AnchorNode) node).getAnchor().detach();
+                }
+            }
+            if (!(node instanceof Camera) && !(node instanceof Sun)) {
+                node.setParent(null);
+            }
+        }
+    }
+
     // Camera
     private void takePhoto() {
         String targetFileFullPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/temp_image.jpeg";
