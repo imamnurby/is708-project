@@ -32,8 +32,6 @@ def resolve_target(scene_image, detected_objects, pointing_direction, command_te
         distance_l.append((obj_name, d, coordinate))
     
     distance_l = sorted(distance_l, key=lambda tup: tup[1])
-    if len(distance_l) > 3:
-        distance_l = distance_l[0:3]
     
     obj_l = []
     # extract wordlist
